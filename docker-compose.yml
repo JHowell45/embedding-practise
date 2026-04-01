@@ -1,0 +1,35 @@
+services:
+  nginx:
+    image: nginx:1.29.5
+    networks:
+      - embedding-net
+  api:
+    build:
+      context: ./embedding-api
+      dockerfile: Dockerfile
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./embedding-api/migrations:/app/migrations
+    networks:
+      - embedding-net
+  db:
+    image: pgvector/pgvector:pg18-trixie
+    restart: always
+    # set shared memory limit when using docker compose
+    shm_size: 128mb
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USER?Variable not set}
+      POSTGRES_PASSWORD: ${DB_PASS?Variable not set}
+      POSTGRES_DB: ${DB_PATH?Variable not set}
+      PGDATA: /var/lib/postgresql/18/docker
+    volumes:
+      - db-data:/var/lib/postgresql/18/docker
+
+volumes:
+  db-data:
+networks:
+  embedding-net:
