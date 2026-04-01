@@ -51,7 +51,8 @@ services:
     volumes:
       - ./.docker/db:/docker-entrypoint-initdb.d
       - db-data:/var/lib/postgresql/18/docker
-
+    networks:
+      - embedding-net
 volumes:
   db-data:
 networks:
