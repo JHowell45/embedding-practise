@@ -1,6 +1,10 @@
 services:
   nginx:
     image: nginx:1.29.5
+    depends_on:
+      api:
+        condition: service_healthy
+        restart: true
     volumes:
       - ./.docker/nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./logs/nginx:/var/log/nginx
@@ -21,13 +25,17 @@ services:
         restart: true
     healthcheck:
       test:
-        ["CMD-SHELL", "curl -f http:127.0.0.1:3000/api/healthcheck || exit 1"]
-      interval: 30s
-      timeout: 20s
+        [
+          "CMD-SHELL",
+          "curl --fail 'http://127.0.0.1:3000/api/healthcheck || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
       retries: 5
-      start_period: 20s
     volumes:
       - ./embedding-api/migrations:/app/migrations
+    ports:
+      - 9000:3000
     networks:
       - embedding-net
   db:
@@ -43,7 +51,7 @@ services:
       POSTGRES_DB: ${DB_PATH?Variable not set}
       PGDATA: /var/lib/postgresql/18/docker
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-d", "db_prod"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_PATH}"]
       interval: 30s
       timeout: 20s
       retries: 5
@@ -51,6 +59,8 @@ services:
     volumes:
       - ./.docker/db:/docker-entrypoint-initdb.d
       - db-data:/var/lib/postgresql/18/docker
+    ports:
+      - "5432:5432"
     networks:
       - embedding-net
 volumes:
