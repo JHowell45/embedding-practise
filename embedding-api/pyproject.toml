@@ -9,5 +9,6 @@ dependencies = [
     "fastapi[standard]>=0.135.3",
     "pgvector>=0.4.2",
     "psycopg[binary]>=3.3.3",
+    "requests>=2.33.1",
     "sqlmodel>=0.0.37",
 ]
