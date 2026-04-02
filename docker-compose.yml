@@ -34,13 +34,11 @@ services:
       retries: 5
     volumes:
       - ./embedding-api/migrations:/app/migrations
-    ports:
-      - 9000:3000
     networks:
       - embedding-net
   embed:
     container_name: embed_service
-    image: ghcr.io/huggingface/text-embeddings-inference:cpu-0.6
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-1.9
     command:
       [
         "--model-id",
